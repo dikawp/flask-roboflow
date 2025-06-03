@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CACAD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #34A853;
+            --danger-color: #EA4335;
+        }
+        
+        .upload-area {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color) !important;
+            background-color: #f8f9fa !important;
+        }
+        
+        .upload-area.active {
+            border-color: var(--secondary-color) !important;
+            background-color: #e8f5e9 !important;
+        }
+        
+        .feature-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .feature-list li {
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .accessible .feature-list li::before {
+            content: "✓";
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .not-accessible .feature-list li::before {
+            content: "✗";
+            color: var(--danger-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        a:focus, button:focus, input:focus, select:focus, textarea:focus {
+            outline: 3px solid #FFA500;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <header class="bg-success text-white py-4 mb-4">
+        <div class="container">
+            <h1 class="text-center mb-3">Deteksi Tempat Ramah Pemain Cacad</h1>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="card shadow-sm mx-auto" style="max-width: 800px;">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-4">Unggah Foto Tempat</h2>
+                
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="locationType" class="form-label">Jenis Tempat</label>
+                        <select class="form-select" id="locationType" aria-label="Pilih jenis tempat" required>
+                            <option value="" selected disabled>Pilih jenis tempat...</option>
+                            <option value="restaurant">Restoran/Kafe</option>
+                            <option value="toilet">Toilet Umum</option>
+                            <option value="parking">Tempat Parkir</option>
+                            <option value="entrance">Pintu Masuk</option>
+                            <option value="public_space">Ruang Publik</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="fileInput" class="form-label">Foto Tempat</label>
+                        <div id="uploadArea" class="upload-area border-2 border-dashed rounded-3 p-5 text-center">
+                            <input type="file" id="fileInput" class="d-none" accept="image/*" required>
+                            <div>
+                                <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-3"></i>
+                                <p class="mb-1">Klik untuk mengunggah foto atau seret dan lepas file di sini</p>
+                                <p class="text-muted small">Format yang didukung: JPG, PNG (Maksimal 5MB)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="additionalNotes" class="form-label">Catatan Tambahan (opsional)</label>
+                        <textarea class="form-control" id="additionalNotes" rows="3" placeholder="Tambahkan deskripsi tentang tempat ini..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-secondary btn-lg w-100 py-2">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Analisis Aksesibilitas
+                    </button>
+                </form>
+                
+                <div class="loading-spinner text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Memproses...</span>
+                    </div>
+                    <p class="mt-2">Menganalisis gambar...</p>
+                </div>
+                
+                <div id="resultContainer" class="mt-4 p-3 rounded d-none">
+                    <h3 class="h5 mb-3">Hasil Analisis</h3>
+                    <div id="resultContent"></div>
+                    <div class="mt-3">
+                        <button id="newAnalysisBtn" class="btn btn-outline-secondary">Analisis Gambar Baru</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-success py-4 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0 text-white">© 2025 WIBU GORENG ASELI SURABAYA BARAT</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            uploadArea.classList.add('active');
+        }
+        
+        function unhighlight() {
+            uploadArea.classList.remove('active');
+        }
+        
+        uploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            updateFileDisplay(files[0]);
+        }
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files.length) {
+                updateFileDisplay(this.files[0]);
+            }
+        });
+        
+        function updateFileDisplay(file) {
+            const fileType = file.type;
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            
+            if (!validImageTypes.includes(fileType)) {
+                alert('Silakan unggah file gambar (JPG, PNG)');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran file terlalu besar. Maksimal 5MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadArea.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview gambar" class="img-thumbnail mb-2" style="max-height: 200px;">
+                    <p class="mb-1">${file.name}</p>
+                    <p class="text-muted small">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // DUMMY BUAT NYOBA
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            const loadingSpinner = document.querySelector('.loading-spinner');
+            
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            loadingSpinner.classList.remove('d-none');
+            
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                spinner.classList.add('d-none');
+                loadingSpinner.classList.add('d-none');
+                
+                // HASIL
+                showResult(false); // GANTI KE FALSE UNTUK NYOBA KALO TIDAK RAMAH DISABILITAS
+            }, 3000);
+        });
+        
+        function showResult(isAccessible) {
+            const resultContainer = document.getElementById('resultContainer');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultContainer.classList.remove('d-none');
+            resultContainer.className = `mt-4 p-3 rounded ${isAccessible ? 'accessible bg-success bg-opacity-10 border-start border-success border-5' : 'not-accessible bg-danger bg-opacity-10 border-start border-danger border-5'}`;
+            
+            if (isAccessible) {
+                resultContent.innerHTML = `
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-check-circle-fill text-success fs-3 me-2"></i>
+                        <h4 class="mb-0">Tempat Ini Ramah Disabilitas!</h4>
+                    </div>
+                    <p>Berdasarkan analisis gambar, tempat ini memiliki fitur aksesibilitas berikut:</p>
+                    <ul class="feature-list mb-3">
+                        <li class="mb-1">Jalur landai untuk kursi roda terdeteksi</li>
+                        <li class="mb-1">Pintu dengan lebar memadai</li>
+                        <li class="mb-1">Area parkir khusus disabilitas</li>
+                    </ul>
+                    <div class="alert alert-success mb-0">
+                        <strong>Skor Aksesibilitas:</strong> 85/100 (Sangat Baik)
+                    </div>
+                `;
+            } else {
+                resultContent.innerHTML = `
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-3 me-2"></i>
+                        <h4 class="mb-0">Tempat Ini Kurang Ramah Disabilitas</h4>
+                    </div>
+                    <p>Berdasarkan analisis gambar, beberapa masalah aksesibilitas ditemukan:</p>
+                    <ul class="feature-list mb-3">
+                        <li class="mb-1">Tidak ada jalur landai untuk kursi roda</li>
+                        <li class="mb-1">Pintu terlalu sempit</li>
+                        <li class="mb-1">Tidak ada tanda braile</li>
+                    </ul>
+                    <div class="alert alert-danger mb-2">
+                        <strong>Skor Aksesibilitas:</strong> 35/100 (Perlu Perbaikan)
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <strong>Saran:</strong> Pertimbangkan untuk menambahkan ramp, melebarkan pintu, dan memasang tactile paving.
+                    </div>
+                `;
+            }
+            
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    
+        // Tombol analisis gambar baru
+        document.getElementById('newAnalysisBtn').addEventListener('click', function() {
+            document.getElementById('uploadForm').reset();
+            document.getElementById('resultContainer').classList.add('d-none');
+            document.getElementById('uploadArea').innerHTML = `
+                <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-3"></i>
+                <p class="mb-1">Klik untuk mengunggah foto atau seret dan lepas file di sini</p>
+                <p class="text-muted small">Format yang didukung: JPG, PNG (Maksimal 5MB)</p>
+            `;
+        });
+    </script>
+</body>
+</html>
