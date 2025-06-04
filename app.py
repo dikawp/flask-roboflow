@@ -68,7 +68,7 @@ def calculate_accessibility_score(detections):
     score = 0.5  # Nilai default
     
     for obj in detections:
-        if obj['class'] == 'sidewalk':
+        if obj['class'] == 'bench':
             score += 0.5 * obj['confidence']  # Bobot penuh untuk sidewalk
             
     return round(max(0, min(1, score)), 2)  # Clamp antara 0 dan 1
