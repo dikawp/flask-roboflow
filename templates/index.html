@@ -1,44 +1,44 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CACAD</title>
+    <title>CACAD - Cek Aksesibilitas Canggih Anti Diskriminasi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
     <style>
         :root {
             --primary-color: #4285F4;
             --secondary-color: #34A853;
             --danger-color: #EA4335;
         }
-        
+
         .upload-area {
             transition: all 0.3s;
             cursor: pointer;
         }
-        
+
         .upload-area:hover {
             border-color: var(--primary-color) !important;
             background-color: #f8f9fa !important;
         }
-        
+
         .upload-area.active {
             border-color: var(--secondary-color) !important;
             background-color: #e8f5e9 !important;
         }
-        
+
         .feature-list {
             list-style-type: none;
             padding-left: 0;
         }
-        
+
         .feature-list li {
             padding-left: 1.5rem;
             position: relative;
         }
-        
+
         .accessible .feature-list li::before {
             content: "✓";
             color: var(--secondary-color);
@@ -46,7 +46,7 @@
             left: 0;
             font-weight: bold;
         }
-        
+
         .not-accessible .feature-list li::before {
             content: "✗";
             color: var(--danger-color);
@@ -54,40 +54,63 @@
             left: 0;
             font-weight: bold;
         }
-        
-        a:focus, button:focus, input:focus, select:focus, textarea:focus {
+
+        .detected-object {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 5px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            background-color: #e9ecef;
+        }
+
+        .object-accessible-toilet-sign {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .object-grab-bars {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .object-emergency-button {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .object-Toilet {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        a:focus,
+        button:focus,
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: 3px solid #FFA500;
             outline-offset: 2px;
         }
     </style>
 </head>
+
 <body class="bg-light">
-    <header class="bg-success text-white py-4 mb-4">
+    <header class="bg-primary text-white py-4 mb-4">
         <div class="container">
-            <h1 class="text-center mb-3">Deteksi Tempat Ramah Pemain Cacad</h1>
+            <h1 class="text-center mb-3">CACAD - Cek Aksesibilitas Canggih Anti Diskriminasi</h1>
         </div>
     </header>
 
     <main class="container my-5">
         <div class="card shadow-sm mx-auto" style="max-width: 800px;">
             <div class="card-body p-4">
-                <h2 class="h4 mb-4">Unggah Foto Tempat</h2>
-                
+                <h2 class="h4 mb-4">Unggah Foto Toilet</h2>
+
                 <form id="uploadForm" enctype="multipart/form-data">
                     <div class="mb-4">
-                        <label for="locationType" class="form-label">Jenis Tempat</label>
-                        <select class="form-select" id="locationType" aria-label="Pilih jenis tempat" required>
-                            <option value="" selected disabled>Pilih jenis tempat...</option>
-                            <option value="restaurant">Restoran/Kafe</option>
-                            <option value="toilet">Toilet Umum</option>
-                            <option value="parking">Tempat Parkir</option>
-                            <option value="entrance">Pintu Masuk</option>
-                            <option value="public_space">Ruang Publik</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="fileInput" class="form-label">Foto Tempat</label>
+                        <label for="fileInput" class="form-label">Foto Toilet</label>
                         <div id="uploadArea" class="upload-area border-2 border-dashed rounded-3 p-5 text-center">
                             <input type="file" id="fileInput" class="d-none" accept="image/*" required>
                             <div>
@@ -97,39 +120,48 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label for="additionalNotes" class="form-label">Catatan Tambahan (opsional)</label>
-                        <textarea class="form-control" id="additionalNotes" rows="3" placeholder="Tambahkan deskripsi tentang tempat ini..."></textarea>
+                        <textarea class="form-control" id="additionalNotes" rows="3"
+                            placeholder="Tambahkan deskripsi tentang toilet ini..."></textarea>
                     </div>
-                    
-                    <button type="submit" class="btn btn-secondary btn-lg w-100 py-2">
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 py-2">
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        Analisis Aksesibilitas
+                        Analisis Aksesibilitas Toilet
                     </button>
                 </form>
-                
+
                 <div class="loading-spinner text-center my-4 d-none">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Memproses...</span>
                     </div>
-                    <p class="mt-2">Menganalisis gambar...</p>
+                    <p class="mt-2">Menganalisis gambar toilet...</p>
                 </div>
-                
+
                 <div id="resultContainer" class="mt-4 p-3 rounded d-none">
-                    <h3 class="h5 mb-3">Hasil Analisis</h3>
+                    <h3 class="h5 mb-3">Hasil Analisis Toilet</h3>
                     <div id="resultContent"></div>
-                    <div class="mt-3">
-                        <button id="newAnalysisBtn" class="btn btn-outline-secondary">Analisis Gambar Baru</button>
+                    <div class="mt-3 ms-auto">
+                        <button id="newAnalysisBtn" class="btn btn-outline-primary">Analisis Gambar Baru</button>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Add this inside the <main> section, after the card div -->
+        <div class="text-center mt-4">
+            <button id="clearHistoryBtn" class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i> Hapus Riwayat Scan
+            </button>
+            <p class="text-muted small mt-2">Menghapus semua gambar yang pernah diunggah dan hasil scan</p>
+        </div>
     </main>
 
-    <footer class="bg-success py-4 mt-auto">
+
+    <footer class="bg-primary py-4 mt-auto">
         <div class="container text-center">
-            <p class="mb-0 text-white">© 2025 WIBU GORENG ASELI SURABAYA BARAT</p>
+            <p class="mb-0 text-white">© 2025 CACAD - Cek Aksesibilitas Canggih Anti Diskriminasi</p>
         </div>
     </footer>
 
@@ -138,65 +170,65 @@
         // Drag and drop
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        
+
         uploadArea.addEventListener('click', () => fileInput.click());
-        
+
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             uploadArea.addEventListener(eventName, preventDefaults, false);
         });
-        
+
         function preventDefaults(e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        
+
         ['dragenter', 'dragover'].forEach(eventName => {
             uploadArea.addEventListener(eventName, highlight, false);
         });
-        
+
         ['dragleave', 'drop'].forEach(eventName => {
             uploadArea.addEventListener(eventName, unhighlight, false);
         });
-        
+
         function highlight() {
             uploadArea.classList.add('active');
         }
-        
+
         function unhighlight() {
             uploadArea.classList.remove('active');
         }
-        
+
         uploadArea.addEventListener('drop', handleDrop, false);
-        
+
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
             fileInput.files = files;
             updateFileDisplay(files[0]);
         }
-        
-        fileInput.addEventListener('change', function() {
+
+        fileInput.addEventListener('change', function () {
             if (this.files.length) {
                 updateFileDisplay(this.files[0]);
             }
         });
-        
+
         function updateFileDisplay(file) {
             const fileType = file.type;
             const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            
+
             if (!validImageTypes.includes(fileType)) {
                 alert('Silakan unggah file gambar (JPG, PNG)');
                 return;
             }
-            
+
             if (file.size > 5 * 1024 * 1024) {
                 alert('Ukuran file terlalu besar. Maksimal 5MB');
                 return;
             }
-            
+
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 uploadArea.innerHTML = `
                     <img src="${e.target.result}" alt="Preview gambar" class="img-thumbnail mb-2" style="max-height: 200px;">
                     <p class="mb-1">${file.name}</p>
@@ -205,78 +237,174 @@
             };
             reader.readAsDataURL(file);
         }
-        
-        // DUMMY BUAT NYOBA
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+
+        // Fungsi untuk mengirim gambar ke server
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const submitBtn = this.querySelector('button[type="submit"]');
             const spinner = submitBtn.querySelector('.spinner-border');
             const loadingSpinner = document.querySelector('.loading-spinner');
-            
+
             submitBtn.disabled = true;
             spinner.classList.remove('d-none');
             loadingSpinner.classList.remove('d-none');
-            
-            setTimeout(() => {
-                submitBtn.disabled = false;
-                spinner.classList.add('d-none');
-                loadingSpinner.classList.add('d-none');
-                
-                // HASIL
-                showResult(false); // GANTI KE FALSE UNTUK NYOBA KALO TIDAK RAMAH DISABILITAS
-            }, 3000);
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    spinner.classList.add('d-none');
+                    loadingSpinner.classList.add('d-none');
+
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    showResult(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.disabled = false;
+                    spinner.classList.add('d-none');
+                    loadingSpinner.classList.add('d-none');
+                    alert('Terjadi kesalahan saat menganalisis gambar');
+                });
         });
-        
-        function showResult(isAccessible) {
+
+        function showResult(data) {
             const resultContainer = document.getElementById('resultContainer');
             const resultContent = document.getElementById('resultContent');
-            
+            const scorePercent = data.score;
+            const isAccessible = data.accessible;
+
+            // Format objek yang terdeteksi (tanpa confidence score)
+            let objectsHtml = '';
+            if (data.objects && data.objects.length > 0) {
+                const uniqueFeatures = [...new Set(data.objects.map(obj => obj.class))];
+                objectsHtml = '<div class="mb-3"><strong>Fitur Terdeteksi:</strong><div class="mt-2">';
+                uniqueFeatures.forEach(feature => {
+                    const classSlug = feature.replace(/\s+/g, '-').toLowerCase();
+                    objectsHtml += `<span class="detected-object object-${classSlug}">${feature}</span>`;
+                });
+                objectsHtml += '</div></div>';
+            }
+
             resultContainer.classList.remove('d-none');
-            resultContainer.className = `mt-4 p-3 rounded ${isAccessible ? 'accessible bg-success bg-opacity-10 border-start border-success border-5' : 'not-accessible bg-danger bg-opacity-10 border-start border-danger border-5'}`;
-            
+            resultContainer.className =
+                `mt-4 p-3 rounded ${isAccessible ? 'accessible bg-success bg-opacity-10 border-start border-success border-5' : 'not-accessible bg-danger bg-opacity-10 border-start border-danger border-5'}`;
+
             if (isAccessible) {
                 resultContent.innerHTML = `
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="bi bi-check-circle-fill text-success fs-3 me-2"></i>
-                        <h4 class="mb-0">Tempat Ini Ramah Disabilitas!</h4>
-                    </div>
-                    <p>Berdasarkan analisis gambar, tempat ini memiliki fitur aksesibilitas berikut:</p>
-                    <ul class="feature-list mb-3">
-                        <li class="mb-1">Jalur landai untuk kursi roda terdeteksi</li>
-                        <li class="mb-1">Pintu dengan lebar memadai</li>
-                        <li class="mb-1">Area parkir khusus disabilitas</li>
-                    </ul>
-                    <div class="alert alert-success mb-0">
-                        <strong>Skor Aksesibilitas:</strong> 85/100 (Sangat Baik)
-                    </div>
-                `;
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-check-circle-fill text-success fs-3 me-2"></i>
+                <h4 class="mb-0">Toilet Ini Ramah Difabel!</h4>
+            </div>
+            ${objectsHtml}
+            <p>Berdasarkan analisis gambar, toilet ini memiliki fitur aksesibilitas yang memadai.</p>
+            <div class="alert alert-success mb-3">
+                <strong>Skor Aksesibilitas:</strong> ${scorePercent}% (${getAccessibilityRating(scorePercent)})
+                <div class="progress mt-2">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: ${scorePercent}%" 
+                        aria-valuenow="${scorePercent}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div class="alert alert-info">
+                <h5 class="h6">Fitur Aksesibilitas yang Terdeteksi:</h5>
+                <ul class="feature-list">
+                    ${[...new Set(data.objects.map(obj => obj.class))].map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="text-center">
+                <img src="${data.processed_image}" alt="Hasil analisis" class="img-fluid rounded" style="max-height: 300px;">
+                <p class="text-muted small mt-2">Gambar hasil analisis dengan anotasi</p>
+            </div>
+        `;
             } else {
                 resultContent.innerHTML = `
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="bi bi-exclamation-triangle-fill text-danger fs-3 me-2"></i>
-                        <h4 class="mb-0">Tempat Ini Kurang Ramah Disabilitas</h4>
-                    </div>
-                    <p>Berdasarkan analisis gambar, beberapa masalah aksesibilitas ditemukan:</p>
-                    <ul class="feature-list mb-3">
-                        <li class="mb-1">Tidak ada jalur landai untuk kursi roda</li>
-                        <li class="mb-1">Pintu terlalu sempit</li>
-                        <li class="mb-1">Tidak ada tanda braile</li>
-                    </ul>
-                    <div class="alert alert-danger mb-2">
-                        <strong>Skor Aksesibilitas:</strong> 35/100 (Perlu Perbaikan)
-                    </div>
-                    <div class="alert alert-info mb-0">
-                        <strong>Saran:</strong> Pertimbangkan untuk menambahkan ramp, melebarkan pintu, dan memasang tactile paving.
-                    </div>
-                `;
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-exclamation-triangle-fill text-danger fs-3 me-2"></i>
+                <h4 class="mb-0">Toilet Ini Kurang Ramah Difabel</h4>
+            </div>
+            ${objectsHtml}
+            <p>Berdasarkan analisis gambar, beberapa fitur aksesibilitas penting tidak terdeteksi.</p>
+            <div class="alert alert-danger mb-3">
+                <strong>Skor Aksesibilitas:</strong> ${scorePercent}% (${getAccessibilityRating(scorePercent)})
+                <div class="progress mt-2">
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: ${scorePercent}%" 
+                        aria-valuenow="${scorePercent}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div class="alert alert-warning">
+                <h5 class="h6">Fitur yang Dibutuhkan:</h5>
+                <ul class="feature-list">
+                    ${getRequiredFeatures(data.objects).map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="alert alert-info">
+                <strong>Saran Perbaikan:</strong> ${getImprovementSuggestions(data.objects)}
+            </div>
+            <div class="text-center">
+                <img src="${data.processed_image}" alt="Hasil analisis" class="img-fluid rounded" style="max-height: 300px;">
+                <p class="text-muted small mt-2">Gambar hasil analisis dengan anotasi</p>
+            </div>
+        `;
             }
-            
-            resultContainer.scrollIntoView({ behavior: 'smooth' });
+
+            resultContainer.scrollIntoView({
+                behavior: 'smooth'
+            });
         }
-    
+
+        function getAccessibilityRating(score) {
+            if (score >= 90) return 'Sangat Aksesibel';
+            if (score >= 70) return 'Aksesibel';
+            if (score >= 50) return 'Cukup Aksesibel';
+            if (score >= 30) return 'Kurang Aksesibel';
+            return 'Tidak Aksesibel';
+        }
+
+        function getRequiredFeatures(detectedObjects) {
+            const allFeatures = ['Toilet', 'accessible-toilet-sign', 'grab-bars', 'emergency-button'];
+            const detected = detectedObjects ? detectedObjects.map(obj => obj.class) : [];
+
+            return allFeatures.filter(feature => !detected.includes(feature));
+        }
+
+        function getImprovementSuggestions(objects) {
+            const detected = objects ? objects.map(obj => obj.class) : [];
+            const suggestions = [];
+
+            if (!detected.includes('accessible-toilet-sign')) {
+                suggestions.push('Pasang tanda toilet aksesibel yang jelas');
+            }
+
+            if (!detected.includes('grab-bars')) {
+                suggestions.push('Tambahkan pegangan tangan (grab bars) di samping toilet');
+            }
+
+            if (!detected.includes('emergency-button')) {
+                suggestions.push('Instal tombol darurat yang mudah dijangkau');
+            }
+
+            if (suggestions.length === 0 && detected.includes('Toilet')) {
+                suggestions.push('Perlu pemeriksaan lebih lanjut oleh ahli aksesibilitas');
+            } else if (suggestions.length === 0) {
+                suggestions.push('Gambar mungkin bukan toilet atau kualitas gambar kurang baik');
+            }
+
+            return suggestions.join(', ') + '.';
+        }
+
         // Tombol analisis gambar baru
-        document.getElementById('newAnalysisBtn').addEventListener('click', function() {
+        document.getElementById('newAnalysisBtn').addEventListener('click', function () {
             document.getElementById('uploadForm').reset();
             document.getElementById('resultContainer').classList.add('d-none');
             document.getElementById('uploadArea').innerHTML = `
@@ -285,6 +413,42 @@
                 <p class="text-muted small">Format yang didukung: JPG, PNG (Maksimal 5MB)</p>
             `;
         });
+
+        // Add this to your existing script
+        document.getElementById('clearHistoryBtn').addEventListener('click', function () {
+            if (confirm(
+                    'Apakah Anda yakin ingin menghapus semua riwayat scan? Ini akan menghapus semua gambar yang pernah diunggah dan hasil analisis.'
+                )) {
+                const btn = this;
+                btn.disabled = true;
+                btn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...';
+
+                fetch('/clear_history', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Riwayat scan berhasil dihapus');
+                        } else {
+                            alert('Gagal menghapus riwayat: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat menghapus riwayat');
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-trash"></i> Hapus Riwayat Scan';
+                    });
+            }
+        });
     </script>
 </body>
+
 </html>
