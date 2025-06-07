@@ -10,7 +10,7 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
 # Load 
 model_toilet = YOLO('./models/yolov8n_toilet-disable/weights/best.pt')
-model_prop = YOLO('yolov8n.pt')
+model_prop = YOLO('./models/yolov8n_prop-disable/weights/best.pt')
 
 def allowed_file(filename):
     return '.' in filename and \
