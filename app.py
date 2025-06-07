@@ -8,8 +8,9 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
-# Load model YOLOv8
-model = YOLO('./models/yolov8n_toilet-disable/weights/best.pt')  
+# Load 
+model_toilet = YOLO('./models/yolov8n_toilet-disable/weights/best.pt')
+model_prop = YOLO('yolov8n.pt')
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -27,16 +28,24 @@ def predict():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    
+
+    kategori = request.form.get('kategori')  
+    if kategori not in ['toilet', 'nyoba']:
+        return jsonify({'error': 'Kategori tidak dikenali'}), 400
+
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        
-        # Prediksi dengan YOLOv8
+
+        # Nyeluk model sesuai kategori
+        if kategori == 'toilet':
+            model = model_toilet
+        else:
+            model = model_prop
+
         results = model.predict(source=filepath, save=True, project="static", name="results", exist_ok=True)
 
-        # Analisis hasil
         detected_objects = []
         for result in results:
             for box in result.boxes:
@@ -47,13 +56,14 @@ def predict():
                     'class': class_name,
                     'confidence': confidence
                 })
-        
-        # Hitung skor 
-        accessibility_score = calculate_accessibility_score(detected_objects)
-        
+
+        # Kalkulasi skor aksesibilitas
+        accessibility_score = calculate_accessibility_score(detected_objects, kategori)
+
         return jsonify({
             'accessible': accessibility_score >= 70,
-            'score': accessibility_score,  
+            'score': accessibility_score,
+            'kategori': kategori,
             'objects': detected_objects,
             'original_image': f'/static/uploads/{filename}',
             'processed_image': f'/static/results/{filename}'
@@ -61,24 +71,34 @@ def predict():
     
     return jsonify({'error': 'Invalid file type'}), 400
 
-def calculate_accessibility_score(detections):
-    feature_scores = {
-        'accessible-toilet-sign': 20,  
-        'grab-bars': 50,              
-        'emergency-button': 20,       
-        'Toilet': 10                  
-    }
-    
+def calculate_accessibility_score(detections, kategori):
+    # Pembagian skor
+    if kategori == 'toilet':
+        feature_scores = {
+            'accessible-toilet-sign': 20,
+            'grab-bars': 50,
+            'emergency-button': 20,
+            'Toilet': 10
+        }
+    elif kategori == 'nyoba':
+        feature_scores = {
+            'ramp': 40,
+            'disability_sign': 30,
+            'stairs': 30
+        }
+    else:
+        feature_scores = {}
+
     total_score = 0
-    detected_features = set()  
-    
+    detected_features = set()
+
     for obj in detections:
         class_name = obj['class']
         if class_name in feature_scores and class_name not in detected_features:
             total_score += feature_scores[class_name]
             detected_features.add(class_name)
-    
-    return total_score  
+
+    return total_score
 
 @app.route('/clear_history', methods=['POST'])
 def clear_history():

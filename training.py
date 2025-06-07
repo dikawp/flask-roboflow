@@ -4,7 +4,7 @@ model = YOLO("yolov8n.pt")
 
 
 model.train(
-    data="./toilet-disable/data.yaml",
+    data="./prop-disable/data.yaml",
     epochs=100,
     optimizer="Adam",
     imgsz=640,               
@@ -15,7 +15,7 @@ model.train(
     degrees=10,             
     batch=8,     
     project="models",  
-    name="yolov8n_toilet-disable",   
+    name="yolov8n_prop-disable",   
     exist_ok=True,          
 )
 
