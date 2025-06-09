@@ -10,7 +10,7 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
 # Load 
 model_toilet = YOLO('./models/yolov8n_toilet-disable/weights/best.pt')
-model_prop = YOLO('yolov8n.pt')
+model_prop = YOLO('best.pt')
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -66,7 +66,7 @@ def predict():
             'kategori': kategori,
             'objects': detected_objects,
             'original_image': f'/static/uploads/{filename}',
-            'processed_image': f'/static/results/{filename}'
+            'processed_image': f'/static/results/{os.path.splitext(filename)[0]}.jpg'
         })
     
     return jsonify({'error': 'Invalid file type'}), 400
