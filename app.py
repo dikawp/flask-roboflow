@@ -8,9 +8,10 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
-# Load 
+# Load models
 model_toilet = YOLO('./models/yolov8n_toilet-disable/weights/best.pt')
-model_prop = YOLO('best.pt')
+model_jpo = YOLO('./models/yolov8n_jpo-disable/weights/best.pt')  # Update with your JPO model path
+model_trotoar = YOLO('./models/yolov8n_jpo-disable/weights/best.pt')  # Update with your Trotoar model path
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -30,7 +31,7 @@ def predict():
         return jsonify({'error': 'No selected file'}), 400
 
     kategori = request.form.get('kategori')  
-    if kategori not in ['toilet', 'nyoba']:
+    if kategori not in ['toilet', 'jpo', 'trotoar']:
         return jsonify({'error': 'Kategori tidak dikenali'}), 400
 
     if file and allowed_file(file.filename):
@@ -38,11 +39,13 @@ def predict():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # Nyeluk model sesuai kategori
+        # Select model based on category
         if kategori == 'toilet':
             model = model_toilet
+        elif kategori == 'jpo':
+            model = model_jpo
         else:
-            model = model_prop
+            model = model_trotoar
 
         results = model.predict(source=filepath, save=True, project="static", name="results", exist_ok=True)
 
@@ -57,7 +60,7 @@ def predict():
                     'confidence': confidence
                 })
 
-        # Kalkulasi skor aksesibilitas
+        # Calculate accessibility score
         accessibility_score = calculate_accessibility_score(detected_objects, kategori)
 
         return jsonify({
@@ -72,7 +75,7 @@ def predict():
     return jsonify({'error': 'Invalid file type'}), 400
 
 def calculate_accessibility_score(detections, kategori):
-    # Pembagian skor
+    # Score distribution
     if kategori == 'toilet':
         feature_scores = {
             'accessible-toilet-sign': 20,
@@ -80,11 +83,16 @@ def calculate_accessibility_score(detections, kategori):
             'emergency-button': 20,
             'Toilet': 10
         }
-    elif kategori == 'nyoba':
+    elif kategori == 'jpo':
         feature_scores = {
-            'ramp': 40,
-            'disability_sign': 30,
-            'stairs': 30
+            'disable_sign': 30,
+            'elevator': 40,
+            'ramp': 20,
+            'tactile-paving': 10
+        }
+    elif kategori == 'trotoar':
+        feature_scores = {
+            'tactile-paving': 100
         }
     else:
         feature_scores = {}

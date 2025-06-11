@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RASA - Ramah Aksesibilitas Sanitasi Aktif</title>
-    <link rel="icon" href="/static/logo-bg.png" type="image/x-icon">
+    <title>PANDU - Pandeteksi Dukung Disabilitas</title>
+    <link rel="icon" href="/static/logo-rmv.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -109,25 +109,24 @@
 <body class="bg-light">
     <header class="text-white py-4 primary-bg">
         <div class="container">
-            <h2 class="text-center">RASA - Ramah Aksesibilitas Sanitasi Aktif</h2>
+            <h2 class="text-center">PANDU - Pandeteksi Dukung Disabilitas</h2>
         </div>
     </header>
     <main class="container">
         <div class="mx-auto text-center">
-            <img src="/static/logo-rmv.png" class="my-4" style="width: 260px;" alt="">
+            <img src="/static/logo-bg.png" class="my-5" style="width: 300px;" alt="">
         </div>
         <div class="card shadow-sm mx-auto" style="max-width: 800px;">
             <div class="card-body p-4">
                 <h2 class="h4 mb-4 text-center accessible">Unggah Foto</h2>
 
                 <form id="uploadForm" enctype="multipart/form-data">
-                    <!-- <div class="mb-3">
-                        <label for="kategori" class="form-label">Pilih Kategori</label>
-                        <select class="form-select" id="kategori" name="kategori" required>
-                            <option value="" selected disabled>Pilih kategori...</option>
-                            <option value="toilet">Toilet Disabilitas</option>
-                        </select>
-                    </div> -->
+                    <select class="form-select mb-3" id="kategori" name="kategori" required>
+                        <option value="" selected disabled>Pilih kategori...</option>
+                        <option value="toilet">Toilet Disabilitas</option>
+                        <option value="jpo">JPO (Jembatan Penyeberangan Orang)</option>
+                        <option value="trotoar">Trotoar</option>
+                    </select>
                     <input type="text" name="" id="kategori" value="toilet" class="form-control d-none" required>
 
                     <div class="mb-4">
@@ -209,7 +208,7 @@
 
     <footer class="py-3 primary-bg">
         <div class="container text-center">
-            <p class="mb-0 text-white">© 2025 RASA - Ramah Aksesibilitas Sanitasi Aktif</p>
+            <p class="mb-0 text-white">© 2025 PANDU - Pandeteksi Dukung Disabilitas</p>
         </div>
     </footer>
 
@@ -550,10 +549,11 @@
             let allFeatures = [];
             if (kategori === 'toilet') {
                 allFeatures = ['Toilet', 'accessible-toilet-sign', 'grab-bars', 'emergency-button'];
-            } 
-            // else if (kategori === 'nyoba') {
-            //     allFeatures = ['ramp', 'disability_sign', 'stairs'];
-            // }
+            } else if (kategori === 'jpo') {
+                allFeatures = ['disable_sign', 'elevator', 'ramp', 'tactile-paving'];
+            } else if (kategori === 'trotoar') {
+                allFeatures = ['tactile-paving'];
+            }
 
             const detected = detectedObjects ? detectedObjects.map(obj => obj.class) : [];
             return allFeatures.filter(feature => !detected.includes(feature));
@@ -573,7 +573,24 @@
                 if (!detected.includes('emergency-button')) {
                     suggestions.push('Instal tombol darurat yang mudah dijangkau');
                 }
-            } 
+            } else if (kategori === 'jpo') {
+                if (!detected.includes('disable_sign')) {
+                    suggestions.push('Pasang tanda aksesibilitas untuk difabel');
+                }
+                if (!detected.includes('elevator')) {
+                    suggestions.push('Tambahkan elevator atau lift');
+                }
+                if (!detected.includes('ramp')) {
+                    suggestions.push('Bangun ramp untuk kursi roda');
+                }
+                if (!detected.includes('tactile-paving')) {
+                    suggestions.push('Pasang paving block pemandu untuk tuna netra');
+                }
+            } else if (kategori === 'trotoar') {
+                if (!detected.includes('tactile-paving')) {
+                    suggestions.push('Pasang paving block pemandu untuk tuna netra');
+                }
+            }
 
             if (suggestions.length === 0) {
                 suggestions.push('Perlu pemeriksaan lebih lanjut oleh ahli aksesibilitas');
